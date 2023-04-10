@@ -38,16 +38,31 @@ export async function postCreateOrUpdateEnrollment(req: AuthenticatedRequest, re
 }
 
 export async function getAddressFromCEP(req: AuthenticatedRequest, res: Response) {
+  const cep = req.query.cep as string;
+
+  if (!cep) {
+    return res.sendStatus(httpStatus.BAD_REQUEST);
+  }
+
+  const viaCEPUrl = `https://viacep.com.br/ws/${cep}/json/`;
+
   try {
-    const { cep } = req.query as { cep: string };
-    const address = await enrollmentsService.getAddressFromCEP(cep);
-    res.status(httpStatus.OK).send(address);
+    const { data } = await axios.get<ViaCEPResponse>(viaCEPUrl);
+
+    if (data.erro) {
+      return res.sendStatus(httpStatus.NOT_FOUND);
+    }
+
+    const { logradouro, complemento, bairro, localidade, uf } = data;
+
+    return res.status(httpStatus.OK).json({
+      logradouro,
+      complemento,
+      bairro,
+      cidade: localidade,
+      uf,
+    });
   } catch (error) {
-    if (error.name === 'NotFoundError') {
-      return res.sendStatus(httpStatus.NO_CONTENT);
-    }
-    if (error.name === 'InvalidBodyDataError') {
-      return res.status(httpStatus.BAD_REQUEST).send(error);
-    }
+    return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 }
