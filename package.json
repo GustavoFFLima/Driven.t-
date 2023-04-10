@@ -5,7 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "rm -rf dist",
+<<<<<<< HEAD
     "build": "ttsc -p tsconfig.build.json",
+=======
+    "build": "tsc -p tsconfig.build.json",
+>>>>>>> ce7ff8d9943370df5652a2b5105f32fee036af78
     "prepare": "husky install",
     "start": "node dist/server.js",
     "migration:run": "prisma migrate deploy",
