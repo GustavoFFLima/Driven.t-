@@ -20,3 +20,12 @@ export async function getTickets(req: AuthenticatedRequest, res: Response, next:
     next(error);
   }
 }
+
+export async function postTickets(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  try {
+    const types = await ticketsService.postTickets(req.userId, req.body.ticketTypeId);
+    res.status(httpStatus.CREATED).send(types);
+  } catch (error) {
+    next(error);
+  }
+}
