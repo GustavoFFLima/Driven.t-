@@ -29,6 +29,26 @@ async function postTickets(enrollmentId: number, ticketTypeId: number) {
     },
   });
 }
-const ticketsRepository = { getTicketsTypes, getTickets, postTickets, getTicketById };
+
+async function findTypeById(id: number): Promise<TicketType> {
+  return prisma.ticketType.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
+async function updatePayment(id: number) {
+  return prisma.ticket.update({
+    where: {
+      id,
+    },
+    data: {
+      status: 'PAID',
+    },
+  });
+}
+
+const ticketsRepository = { getTicketsTypes, getTickets, postTickets, getTicketById, findTypeById, updatePayment };
 
 export default ticketsRepository;
