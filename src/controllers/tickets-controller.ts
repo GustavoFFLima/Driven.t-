@@ -26,6 +26,9 @@ export async function postTickets(req: AuthenticatedRequest, res: Response, next
     const types = await ticketsService.postTickets(req.userId, req.body.ticketTypeId);
     res.status(httpStatus.CREATED).send(types);
   } catch (error) {
+    if (error.name === 'NotFoundError') {
+      return res.status(httpStatus.NOT_FOUND).send(error.message);
+    }
     next(error);
   }
 }

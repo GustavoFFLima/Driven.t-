@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import dayjs from "dayjs";
+import { PrismaClient } from '@prisma/client';
+import dayjs from 'dayjs';
 const prisma = new PrismaClient();
 
 async function main() {
@@ -7,11 +7,11 @@ async function main() {
   if (!event) {
     event = await prisma.event.create({
       data: {
-        title: "Driven.t",
-        logoImageUrl: "https://files.driveneducation.com.br/images/logo-rounded.png",
-        backgroundImageUrl: "linear-gradient(to right, #FA4098, #FFD77F)",
+        title: 'Driven.t',
+        logoImageUrl: 'https://files.driveneducation.com.br/images/logo-rounded.png',
+        backgroundImageUrl: 'linear-gradient(to right, #FA4098, #FFD77F)',
         startsAt: dayjs().toDate(),
-        endsAt: dayjs().add(21, "days").toDate(),
+        endsAt: dayjs().add(21, 'days').toDate(),
       },
     });
   }
