@@ -8,7 +8,7 @@ async function enrollmentTicketValidation(userId: number) {
   const enrollment = await enrollmentRepository.findenrollmentByUserId(userId);
   if (!enrollment) throw notFoundError();
 
-  const ticket = await ticketsRepository.findTickets(enrollment.id);
+  const ticket = await ticketsRepository.getTickets(enrollment.id);
   if (!ticket) throw notFoundError();
 
   if (ticket.status !== 'PAID' || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) throw paymentError();
