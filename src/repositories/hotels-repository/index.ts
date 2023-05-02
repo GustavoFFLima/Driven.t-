@@ -13,4 +13,8 @@ async function getHotelbyId(id: number): Promise<
   return prisma.hotel.findUnique({ where: { id }, include: { Rooms: true } });
 }
 
-export const hotelsRepository = { getHotels, getHotelbyId };
+async function getRoom(id: number) {
+  return prisma.room.findUnique({ where: { id }, include: { Booking: true } });
+}
+
+export const hotelsRepository = { getHotels, getHotelbyId, getRoom };
