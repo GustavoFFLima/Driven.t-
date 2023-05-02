@@ -35,9 +35,23 @@ async function postBooking(userId: number, roomId: number) {
   };
 }
 
+async function putBooking(userId: number, roomId: number, bookingId: number) {
+  enrollmentTicketValidation(userId);
+  const room = await hotelsRepository.getRoom(roomId);
+  if (!room) throw notFoundError();
+  if (room.Booking.length >= room.capacity) {
+    throw forbidden();
+  }
+
+  const booking = await bookingRepository.putBooking(userId, roomId, bookingId);
+  return {
+    bookingId: booking.id,
+  };
+}
 const bookingService = {
   getBooking,
   postBooking,
+  putBooking,
 };
 
 export default bookingService;
