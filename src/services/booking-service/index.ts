@@ -6,10 +6,16 @@ import ticketsRepository from '@/repositories/tickets-repository';
 
 async function enrollmentTicketValidation(userId: number) {
   const enrollment = await enrollmentRepository.findenrollmentByUserId(userId);
-  if (!enrollment) throw notFoundError();
+  if (!enrollment) {
+    console.log(`!enrollment`);
+    throw notFoundError();
+  }
 
   const ticket = await ticketsRepository.getTickets(enrollment.id);
-  if (!ticket) throw notFoundError();
+  if (!ticket) {
+    console.log(`!ticket`);
+    throw notFoundError();
+  }
 
   if (ticket.status !== 'PAID' || ticket.TicketType.isRemote || !ticket.TicketType.includesHotel) throw forbidden();
 
@@ -42,7 +48,8 @@ async function putBooking(userId: number, roomId: number, bookingId: number) {
   if (room.Booking.length >= room.capacity) {
     throw forbidden();
   }
-
+  const findBooking = await bookingRepository.getBooking(userId);
+  if (!findBooking) throw forbidden();
   const booking = await bookingRepository.putBooking(userId, roomId, bookingId);
   return {
     bookingId: booking.id,
