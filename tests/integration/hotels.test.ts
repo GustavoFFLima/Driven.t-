@@ -26,7 +26,7 @@ beforeEach(async () => {
 
 const server = supertest(app);
 
-function invalidTokenVerification(route: string) {
+function invalidTokenValidation(route: string) {
   it('should respond with status 401 if no token is given', async () => {
     const response = await server.get(`${route}`);
 
@@ -107,7 +107,7 @@ function enrollmentAndTicketValidation(route: string) {
 }
 
 describe('GET /hotels', () => {
-  invalidTokenVerification('/hotels');
+  invalidTokenValidation('/hotels');
 
   describe('when token is valid', () => {
     enrollmentAndTicketValidation('/hotels');
@@ -151,7 +151,7 @@ describe('GET /hotels', () => {
 });
 
 describe('GET /hotels/:id', () => {
-  invalidTokenVerification('/hotels/1');
+  invalidTokenValidation('/hotels/1');
 
   describe('when token is valid', () => {
     enrollmentAndTicketValidation('/hotels/1');
