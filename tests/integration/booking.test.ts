@@ -5,6 +5,7 @@ import faker from '@faker-js/faker';
 import { Hotel, TicketStatus } from '@prisma/client';
 import { cleanDb, generateValidToken } from '../helpers';
 import {
+  createBooking,
   createEnrollmentWithAddress,
   createHotelTicketType,
   createNoHotelTicketType,
@@ -112,16 +113,35 @@ describe('POST /booking', () => {
   describe('when token is valid', () => {
     enrollmentAndTicketValidation('/booking', 'post', { roomId: 1 });
 
-    // it(`should respond with status 404 there is no booking`, async () => {
+    it(`should respond with status 404 there is no room`, async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createHotelTicketType();
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+      await createHotel();
+
+      const response = await server.get('/booking').set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+
+    // it(`should respond with status 403 there is no room`, async () => {
     //   const user = await createUser();
     //   const token = await generateValidToken(user);
     //   const enrollment = await createEnrollmentWithAddress(user);
     //   const ticketType = await createHotelTicketType();
     //   await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
 
-    //   const response = await server.get('/booking').set('Authorization', `Bearer ${token}`);
+    //   const hotel = await createHotel();
 
-    //   expect(response.status).toBe(httpStatus.NOT_FOUND);
+    //   const room = await createRoom(hotel.id);
+    //   await createBooking(user.id, room.id);
+
+    //   const response = await server.get('/booking').set('Authorization', `Bearer ${token}`).send({roomId: room.id});
+
+    //   expect(response.status).toBe(httpStatus.FORBIDDEN);
     // });
 
     // it(`should respond with status 200 and hotel array with hotel`, async () => {
