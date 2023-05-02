@@ -198,3 +198,11 @@ describe('GET /booking', () => {
     });
   });
 });
+
+describe('PUT /booking', () => {
+  invalidTokenValidation('/booking/1', 'put');
+
+  describe('when token is valid', () => {
+    enrollmentAndTicketValidation('/booking/1', 'put', { roomId: 1 });
+  });
+});
