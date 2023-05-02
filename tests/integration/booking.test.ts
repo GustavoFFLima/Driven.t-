@@ -2,7 +2,7 @@ import supertest from 'supertest';
 import httpStatus from 'http-status';
 import * as jwt from 'jsonwebtoken';
 import faker from '@faker-js/faker';
-import { Hotel, TicketStatus } from '@prisma/client';
+import { TicketStatus } from '@prisma/client';
 import { cleanDb, generateValidToken } from '../helpers';
 import {
   createBooking,
@@ -137,35 +137,64 @@ describe('POST /booking', () => {
     //   const hotel = await createHotel();
 
     //   const room = await createRoom(hotel.id);
+    //   const booking = await createBooking(user.id, room.id);
     //   await createBooking(user.id, room.id);
-
-    //   const response = await server.get('/booking').set('Authorization', `Bearer ${token}`).send({roomId: room.id});
+    //   const response = await server
+    //     .get('/booking')
+    //     .send({ roomId: booking.Room.id })
+    //     .set('Authorization', `Bearer ${token}`);
 
     //   expect(response.status).toBe(httpStatus.FORBIDDEN);
     // });
 
-    // it(`should respond with status 200 and hotel array with hotel`, async () => {
-    //   const user = await createUser();
-    //   const token = await generateValidToken(user);
-    //   const enrollment = await createEnrollmentWithAddress(user);
-    //   const ticketType = await createHotelTicketType();
-    //   await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
-    //   const hotel = await createHotel();
+    it('should respond with status 200 and bookingId when right body is given', async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createHotelTicketType();
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      const hotel = await createHotel();
+      const room = await createRoom(hotel.id);
 
-    //   const response = await server.get('/booking').set('Authorization', `Bearer ${token}`);
+      const response = await server.post(`/booking`).send({ roomId: room.id }).set('Authorization', `Bearer ${token}`);
 
-    //   const booking = response.body as Hotel[];
+      expect(response.status).toBe(httpStatus.OK);
+      expect(response.body).toEqual({ bookingId: expect.any(Number) });
+    });
+  });
+});
 
-    //   expect(response.status).toBe(httpStatus.OK);
-    //   expect(hotels).toEqual([
-    //     {
-    //       id: hotel.id,
-    //       name: hotel.name,
-    //       image: hotel.image,
-    //       createdAt: hotel.createdAt.toISOString(),
-    //       updatedAt: hotel.updatedAt.toISOString(),
-    //     },
-    //   ]);
-    // });
+describe('GET /booking', () => {
+  invalidTokenValidation('/booking', 'get');
+
+  describe('when token is valid', () => {
+    it('should respond with status 404 is not a booking', async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createHotelTicketType();
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      const hotel = await createHotel();
+      const room = await createRoom(hotel.id);
+
+      const response = await server.get(`/booking`).send({ roomId: room.id }).set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+
+    it('should respond with status 200 is booking found', async () => {
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createHotelTicketType();
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+      const hotel = await createHotel();
+      const room = await createRoom(hotel.id);
+      await createBooking(user.id, room.id);
+
+      const response = await server.get(`/booking`).send({ roomId: room.id }).set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.OK);
+    });
   });
 });
