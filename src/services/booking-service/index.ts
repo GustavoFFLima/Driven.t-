@@ -6,8 +6,9 @@ import ticketsRepository from '@/repositories/tickets-repository';
 
 async function enrollmentTicketValidation(userId: number) {
   const enrollment = await enrollmentRepository.findenrollmentByUserId(userId);
+  console.log(`!enrollment1`);
   if (!enrollment) {
-    console.log(`!enrollment`);
+    console.log(`!enrollment2`);
     throw notFoundError();
   }
 
@@ -29,7 +30,7 @@ async function getBooking(userId: number) {
 }
 
 async function postBooking(userId: number, roomId: number) {
-  enrollmentTicketValidation(userId);
+  await enrollmentTicketValidation(userId);
   const room = await hotelsRepository.getRoom(roomId);
   if (!room) throw notFoundError();
   if (room.Booking.length >= room.capacity) {
@@ -42,7 +43,7 @@ async function postBooking(userId: number, roomId: number) {
 }
 
 async function putBooking(userId: number, roomId: number, bookingId: number) {
-  enrollmentTicketValidation(userId);
+  await enrollmentTicketValidation(userId);
   const room = await hotelsRepository.getRoom(roomId);
   if (!room) throw notFoundError();
   if (room.Booking.length >= room.capacity) {
